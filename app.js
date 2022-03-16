@@ -124,7 +124,7 @@ app.get('/success', async function(req, res) {
   res.render('success', {
       // paymentStatus: session.payment_status,
       amountTotal: session.amount_total,
-      // paymentId: session.payment_intent,
+      paymentId: session.payment_intent,
       email: customer.email
   });
 });
