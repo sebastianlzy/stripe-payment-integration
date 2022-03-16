@@ -1,8 +1,8 @@
 # How to get started
 
-## Create product and price in stripe
+## [Prerequisite] Create product and SKU in Stripe
 
-1. To init the product list with sku, ```npm run createProduct```
+Initialize the product list with sku, ```npm run createProduct```
 
 References
 1. https://stripe.com/docs/api/products/create
@@ -25,9 +25,8 @@ Ensure safe retry without accidentally performing the same operation twice
 
 ## 2. Simple
 We favor simplicity and offload complexity
-1. Payment complexity
-2. Inventory management - https://stripe.com/docs/api/skus/object
-3. Session expiry - https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-expires_at
+1. Simplify payment
+2. Offload inventory management - https://stripe.com/docs/api/skus/object
 
 ## 3. Fast
 Time is of essence. We look into optimising for speed
@@ -35,25 +34,23 @@ Time is of essence. We look into optimising for speed
 
 ## 4. Secure
 Trust little 
-1. Do not trust the integrity of request coming in from user's browser
-2. Mask product id (i.e. do not use running number)
+1. Do not trust request coming in from user's browser
+2. Mask product id
+3. Setup session expiry - https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-expires_at
 
 # How does it work?
 
 ![High level architecture](./public/high-level-architecture.png)
 
-1. Customer click on the product that they wish to purchase (http://localhost:3000/)
-   1. Retrieve item from cache 
-2. Customer will be redirected to the checkout page (http://localhost:3000/checkout?item=1)
-   1. Using http get query attribute to pass item id
-   2. NOTE: item id != product id
-3. Customer will click pay 
-   1. Attributes, {uuid, skuid} will be passed back to server for processing
-   2. Stripe checkout session is created
-      1. expiry 60 mins
-      2. set uuid idempotent key
-      3. retrieve price from cache server
-4. Stripe will redirect a customer base on the response
+| Steps | Customer action                                          | What is done ?                                                                      | Comment                                                                           |
+|-------|----------------------------------------------------------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| 1     | Customer loads web application                           | Product retrieved from cache                                                       |                                                                                   |
+| 2     | Customer clicked on the product they wish to purchase    | ItemId is added to http GET query parameters                                       | Note: item id is the order of the product displayed and is not product id         |
+|       |                                                          | Request is redirected to /checkout                                                 |                                                                                   |
+| 3     | Customer clicked on "pay" button                         | Attribute {uuid, skuid} is passed to server for processing                         | {uuid} is used as an idempotent key to identify the session and ensure safe retry |
+|       |                                                          | Server creates a Stripe checkout session which expires in 60 mins                  |                                                                                   |
+|       |                                                          | Stripe checkout session will redirect user back to /success for successful payment |                                                                                   |
+| 4     | Customer can view the transaction status and amount paid |                                                                                    |                                                                                   |
 
 References
 1. https://stripe.com/docs/api/checkout/sessions/create
@@ -63,13 +60,13 @@ References
 
 ## Challenges encounter?
 
-1. Account name not setup during signup
-2. No email validation
-3. Documentation outdated
+1. Account name was not setup during signup which prevented any call to create session
+2. No email validation done on checkout page
+3. Documentation not in sync with SDK 
    1. idempotency_key not used
    2. product attribute, "type" not stated
-4. Too much information
-5. Lack of an end to end scenario examples
+4. Too much information in documentation making it hard to sieve through the noise
+5. Lack of an end to end scenario examples in documentation
 
 ## How to extend further?
 
@@ -82,14 +79,14 @@ References
    5. Shopping cart
 2. App performance
    1. Handle error codes - https://stripe.com/docs/error-codes
-   2Integrate caching strategy 
+   2. Integrate caching strategy 
       1. TTL/force invalidation  
 3. Security
    1. Secret key rotation
-   2. Integrate with a vault (i.e. secret manager)
+   2. Integrate with a secure vault (i.e. secret manager)
 4. Test
-   1. Add test for happy path (E2E)
-   2. Add unit test
+   1. Add tests for happy path (E2E)
+   2. Add unit tests
 
 # Demo
 
