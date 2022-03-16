@@ -1,1 +1,23 @@
-{"1":{"title":"The Art of Doing Science and Engineering","productId":"7059d365c18d3355d3cb31c2d8ffbdd6","amount":2300,"currency":"sgd","skuId":"sku_LKTLdi1SKT4L7g"},"2":{"title":"The Making of Prince of Persia: Journals 1985-1993","productId":"84f920437ca161985497263a0558432b","amount":2500,"currency":"sgd","skuId":"sku_LKTLmOf6uzfwvO"},"3":{"title":"Working in Public: The Making and Maintenance of Open Source","productId":"38903ddc43ff07ef1a5f5def213082b5","amount":2800,"currency":"sgd","skuId":"sku_LKTL6msQj3h4yv"}}
+{
+  "1": {
+    "title": "The Art of Doing Science and Engineering",
+    "productId": "86d8a0b61081a6b3da07f588cdc9a114",
+    "amount": 2300,
+    "currency": "sgd",
+    "skuId": "sku_LKX6WAgwd2dE2T"
+  },
+  "2": {
+    "title": "The Making of Prince of Persia: Journals 1985-1993",
+    "productId": "82d8a688731da10cb06b5c3405750dd2",
+    "amount": 2500,
+    "currency": "sgd",
+    "skuId": "sku_LKX69GjptX612S"
+  },
+  "3": {
+    "title": "Working in Public: The Making and Maintenance of Open Source",
+    "productId": "c73a0cce1c9facd90cbea2f6f93333b4",
+    "amount": 2800,
+    "currency": "sgd",
+    "skuId": "sku_LKX63q2RjjjlEs"
+  }
+}

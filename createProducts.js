@@ -27,7 +27,7 @@ const items = [
     }
 ]
 
-const uniqueSessionID = "031620221208"
+const uniqueSessionID = "031620221608"
 
 const createProduct = async (items) =>  {
     const res = {}
