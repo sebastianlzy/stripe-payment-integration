@@ -1,7 +1,7 @@
 # How to get started
 
 1. To init the product list with sku, `npm run createProduct`
-2. Rename `sample.env` to `.env` and populate with your Stripe account's test API keys
+2. Rename `.env.sample` to `.env` and populate with your Stripe account's test API keys
 3. Run server, `npm run start`
 4. Navigate to [http://localhost:3000](http://localhost:3000) to view the index page.
 
@@ -20,45 +20,48 @@ References
 
 ## Tenets
 
-1. Idempotency: Ensure safe retry without accidentally performing the same operation twice
-2. Simple: We favor simplicity
-3. Fast: Time is of essence. We look into optimising for speed
-4. Secure: Trust as little as possible
-
-### Idempotency
+### 1. Idempotency
+Ensure safe retry without accidentally performing the same operation twice
 1. Insert idempotencyKey to Post request
    1. Create product/sku
    2. Create checkout session (via uuid)
 
-### Simple
-1. Offload 
-   1. Payment complexity
-   2. Inventory management - https://stripe.com/docs/api/skus/object
-   3. Session expiry - https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-expires_at
+### 2. Simple
+We favor simplicity and offload complexity
+1. Payment complexity
+2. Inventory management - https://stripe.com/docs/api/skus/object
+3. Session expiry - https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-expires_at
 
-### Fast
-1. Cache product metadata - cache it in local files
+### 3. Fast
+Time is of essence. We look into optimising for speed
+1. Cache product metadata - cache it locally
 
-### Secure
-1. Do not trust any user input - retrieve from local file
-2. Ensure not to use running number for product id
+### 4. Secure
+Trust little 
+1. Do not trust the integrity of request coming in from user's browser
+2. Mask product id (i.e. do not use running number)
 
 ## How does it work?
-1. Pre-setup
-   1. Create account
-   2. Create product/skus
-2. During purchase
-   1. Customer will click on the product that they wish to purchase (http://localhost:3000/)
-      1. retrieve item from cache 
-   2. Customer will be redirected to the checkout page (http://localhost:3000/checkout?item=1)
-      1. Using http get query attribute to pass item id
-      2. NOTE: item id != product id
-   3. Customer will click pay 
-      1. attribute, {uuid, skuid} will be passed back to server for processing
-      2. a stripe checkout session is created
-         1. expiry 60 mins
-         2. set uuid idempotent key
-         3. retrieve price from cache server
+### Pre-setup
+1. Create account
+2. Create product/skus
+
+### During purchase
+
+![High level architecture](./public/high-level-architecture.png)
+
+1. Customer will click on the product that they wish to purchase (http://localhost:3000/)
+   1. retrieve item from cache 
+2. Customer will be redirected to the checkout page (http://localhost:3000/checkout?item=1)
+   1. Using http get query attribute to pass item id
+   2. NOTE: item id != product id
+3. Customer will click pay 
+   1. attribute, {uuid, skuid} will be passed back to server for processing
+   2. a stripe checkout session is created
+      1. expiry 60 mins
+      2. set uuid idempotent key
+      3. retrieve price from cache server
+4. Stripe will redirect a customer base on the response
 
 ## Challenges encounter?
 1. Account name not setup during signup
@@ -74,10 +77,11 @@ References
       1. Enable future product feature request (i.e. display order summary/push app notification/send email)
    2. Integrate with other payment method (i.e. apple pay/google pay)
    3. Handle dispute/refunds - https://stripe.com/docs/file-upload
-   5. Shipping rates/tax rates/tax codes/promotion codes - https://stripe.com/docs/api/promotion_codes
+   4. Shipping rates/tax rates/tax codes/promotion codes - https://stripe.com/docs/api/promotion_codes
+   5. Shopping cart
 2. App performance
    1. Handle error codes - https://stripe.com/docs/error-codes
-   2. Integrate caching strategy 
+   2Integrate caching strategy 
       1. TTL/force invalidation  
 3. Security
    1. Secret key rotation
@@ -96,4 +100,3 @@ For that, we will make use of SKU to ensure we will always be able to fulfil a c
 
 References
 1. https://stripe.com/docs/payments/checkout/migrating-prices?integration=client
-2. 

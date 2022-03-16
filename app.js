@@ -94,7 +94,7 @@ app.post('/create-checkout-session', async (req, res) => {
       mode: 'payment',
       customer_email: email,
       success_url: `${process.env.DOMAIN_URL}/success`,
-      cancel_url: `${process.env.DOMAIN_URL}/checkout?error=An%20error%20has%20occured.%20please%20try%20again`,
+      cancel_url: `${process.env.DOMAIN_URL}`,
       expires_at: getSecondsSinceEpoch(getFutureDate(SixtyMinutesInSeconds))
     }, {
       idempotencyKey: uuid
