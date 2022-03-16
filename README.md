@@ -92,6 +92,21 @@ References
 
 ![demo.gif](./public/demo.gif)
 
+# Screenshots
+
+/checkout 
+
+![checkout](./public/checkout.png)
+
+Stripe checkout element
+
+![checkout-element](./public/stripe-element.png)
+
+/success
+![success](./public/payment_success.png)
+
+## Payment Success
+
 # FAQ
 
 ## Why did we not use price? 
