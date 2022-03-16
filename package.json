@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "SA Takehome Project",
   "scripts": {
-    "start": "node app.js"
+    "server": "node app.js",
+    "start": "nodemon app.js",
+    "createProduct": "node createProducts.js"
   },
   "author": "Matt Mitchell",
   "license": "MIT",
@@ -12,6 +14,11 @@
     "express": "^4.13.3",
     "express-handlebars": "^5.2.1",
     "path": "^0.12.7",
-    "stripe": "^8.137.0"
+    "stripe": "^8.209.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "md5": "^2.3.0",
+    "nodemon": "^2.0.15"
   }
 }

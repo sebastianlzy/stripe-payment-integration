@@ -1,10 +1,13 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
-require('dotenv').config();
-const stripe = require('stripe');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const items = require("./products.json")
+const {v4} = require('uuid')
 
-var app = express();
+let app = express();
 
 // view engine setup (Handlebars)
 app.engine('hbs', exphbs({
@@ -15,6 +18,22 @@ app.set('view engine', 'hbs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json({}));
+
+/**
+ * Helper methods
+ */
+
+const getItemMetaData = (itemId) => {
+  return items[itemId] === undefined ? {} : items[itemId]
+}
+
+const getSecondsSinceEpoch = (date) => {
+  return Math.floor(date/1000)
+}
+
+const getFutureDate = (seconds) => {
+  return new Date(+new Date() + seconds)
+}
 
 /**
  * Home route
@@ -28,33 +47,67 @@ app.get('/', function(req, res) {
  */
 app.get('/checkout', function(req, res) {
   // Just hardcoding amounts here to avoid using a database
-  const item = req.query.item;
-  let title, amount, error;
+  let error;
+  let item = getItemMetaData(req.query.item);
 
-  switch (item) {
-    case '1':
-      title = "The Art of Doing Science and Engineering"
-      amount = 2300      
-      break;
-    case '2':
-      title = "The Making of Prince of Persia: Journals 1985-1993"
-      amount = 2500
-      break;     
-    case '3':
-      title = "Working in Public: The Making and Maintenance of Open Source"
-      amount = 2800  
-      break;     
-    default:
-      // Included in layout view, feel free to assign error
-      error = "No item selected"      
-      break;
+  if (item.length === 0) {
+    error = "No item selected"
+  }
+
+  if (req.query.error) {
+    error = req.query.error
   }
 
   res.render('checkout', {
-    title: title,
-    amount: amount,
+    ...item,
+    uuid: v4(),
     error: error
   });
+});
+
+// create checkout session
+app.post('/create-checkout-session', async (req, res) => {
+  try {
+
+    console.log(req.body)
+    const {skuId, uuid, email} = req.body;
+
+    if (skuId === "") {
+      return res.render('checkout', {
+        error: "No item selected"
+      });
+    }
+
+    if (uuid === "") {
+       throw new Error("uuid not present")
+    }
+
+    const SixtyMinutesInSeconds = 60000*60
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+          price: skuId,
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      customer_email: email,
+      success_url: `${process.env.DOMAIN_URL}/success`,
+      cancel_url: `${process.env.DOMAIN_URL}/checkout?error=An%20error%20has%20occured.%20please%20try%20again`,
+      expires_at: getSecondsSinceEpoch(getFutureDate(SixtyMinutesInSeconds))
+    }, {
+      idempotencyKey: uuid
+    });
+
+    res.redirect(303, session.url);
+  } catch (e) {
+    console.error(e.message)
+    return res.render('checkout', {
+      error: "An error has occurred. Please try again"
+    });
+  }
+
 });
 
 /**
