@@ -16,27 +16,33 @@ References
 3. Navigate to [http://localhost:3000](http://localhost:3000) to view the index page.
 
 # Tenets
+Tenets guide our decision-making as well as keeping us aligned with our overall goals for this project 
 
 ## 1. Idempotency
 Ensure safe retry without accidentally performing the same operation twice
-1. Insert idempotencyKey to Post request
-   1. Create product/sku
-   2. Create checkout session (via uuid)
+
+Things done in this demo
+1. We insert idempotencyKey to all "POST" request. For example, the creation of product and checkout session (via uuid)
 
 ## 2. Simple
 We favor simplicity and offload complexity
-1. Simplify payment
-2. Offload inventory management - https://stripe.com/docs/api/skus/object
+
+Things done in this demo
+1. We simplify payment by using Stripe elements
+2. We offload inventory management to Stripe SKU - https://stripe.com/docs/api/skus/object
 
 ## 3. Fast
 Time is of essence. We look into optimising for speed
-1. Cache product metadata - cache it locally
+
+Things done in this demo
+1. We cache product metadata locally
 
 ## 4. Secure
-Trust little 
-1. Do not trust request coming in from user's browser
-2. Mask product id
-3. Setup session expiry - https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-expires_at
+Trust little. We do not trust request coming in from user's browser. 
+
+Things done in this demo
+1. We mask product id to prevent data leakage
+2. We set up session expiry - https://stripe.com/docs/api/checkout/sessions/create#create_checkout_session-expires_at
 
 # How does it work?
 
@@ -60,33 +66,42 @@ References
 
 ## Challenges encounter?
 
-1. Account name was not setup during signup which prevented any call to create session
-2. No email validation done on checkout page
-3. Documentation not in sync with SDK 
-   1. idempotency_key not used
-   2. product attribute, "type" not stated
-4. Too much information in documentation making it hard to sieve through the noise
-5. Lack of an end to end scenario examples in documentation
+Overall, the integration process was pleasant and simple. However, there are a few points that could be improved 
+
+### On documentation
+
+On documentation, many of the provided information were not in sync with the latest SDK. For example "idempotency_key" is deprecated and product attribute, "type" was not documented
+In addition, there was too much information provided in documentation making it hard to sieve through the noise. Lastly, a lack of an end to end scenario examples in documentation hinders development speed
+
+### Technical setup
+1. During signup, account name was not setup which prevented any call to create session.
+2. During checkout process, there was no email validation done
 
 ## How to extend further?
 
-1. Feature request
-   1. Listen to the event triggered - https://stripe.com/docs/webhooks
-      1. Enable future product feature request (i.e. display order summary/push app notification/send email)
-   2. Integrate with other payment method (i.e. apple pay/google pay)
-   3. Handle dispute/refunds - https://stripe.com/docs/file-upload
-   4. Shipping rates/tax rates/tax codes/promotion codes - https://stripe.com/docs/api/promotion_codes
-   5. Shopping cart
-2. App performance
-   1. Handle error codes - https://stripe.com/docs/error-codes
-   2. Integrate caching strategy 
-      1. TTL/force invalidation  
-3. Security
-   1. Secret key rotation
-   2. Integrate with a secure vault (i.e. secret manager)
-4. Test
-   1. Add tests for happy path (E2E)
-   2. Add unit tests
+This application can be further expanded in 4 key areas, feature request, app performance, security and testing.
+
+### Feature request
+
+1. As a customer, I would like to receive notifications through app/email on product fulfillment status - https://stripe.com/docs/webhooks
+2. As a customer, I would like to select my favorite payment method (apple pay/google pay) 
+3. As a customer, I would like to refund/dispute a payment made - https://stripe.com/docs/file-upload
+4. As a customer, I would like to add items into a shopping cart
+5. As a merchant, I would like to include variable cost such as tax rates/codes and shipping rates 
+6. As a merchant, I would like to boost sales through the use of promotion codes - https://stripe.com/docs/api/promotion_codes
+
+### App performance
+
+1. As an application developer, I would like to ensure we handle all the possible error codes response - https://stripe.com/docs/error-codes
+2. As an application developer, I would like to enforce a caching strategy such as TTL/force invalidation
+
+### Security
+1. As a security engineer, I would like to ensure my secrets are stored in a secure vault (i.e. secret manager)
+2. As a security engineer, I would like to see my secret key rotated
+
+### Test
+1. As a QA engineer, I would like to add tests for all happy paths (E2E)
+2. As a QA engineer, I would like to add integration tests
 
 # Demo
 
@@ -94,15 +109,15 @@ References
 
 # Screenshots
 
-/checkout 
+### /checkout 
 
 ![checkout](./public/checkout.png)
 
-Stripe checkout element
+### Stripe checkout element
 
 ![checkout-element](./public/stripe-element.png)
 
-/success
+### /success
 ![success](./public/payment_success.png)
 
 ## Payment Success
@@ -117,3 +132,9 @@ For that, we will make use of SKU to ensure we will always be able to fulfil a c
 
 References
 1. https://stripe.com/docs/payments/checkout/migrating-prices?integration=client
+
+## What is the objective?
+
+1. Select a book to purchase.
+2. Checkout and purchase the item using Stripe Elements.
+3. Display a confirmation of purchase to the user with the total amount of the charge and Stripe Payment Intent ID (beginning with pi_).
